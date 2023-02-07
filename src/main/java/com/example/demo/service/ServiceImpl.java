@@ -3,18 +3,30 @@ package com.example.demo.service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.entity.BingeScoreResponse;
+import com.example.demo.entity.DailyStats;
 import com.example.demo.entity.StreakTxn;
+import com.example.demo.entity.WatchData;
 import com.example.demo.repo.StreakTxnDataRepository;
+import com.example.demo.repo.WatchDataRepository;
 
 @Service
 public class ServiceImpl {
 	
 	@Autowired
 	StreakTxnDataRepository streakTxnDataRepository;
+	
+
+	@Autowired
+  WatchDataRepository watchDataRepository;
 	
 	public StreakTxn getStreakScoreAndBreak(String id) {
 		
@@ -52,5 +64,41 @@ public class ServiceImpl {
 
 		return newTxn;
 
+	}
+	
+	public BingeScoreResponse getDailyStats(String id) {
+		List <WatchData> watchData=watchDataRepository.findAllByAccountId(id);
+		
+		List<DailyStats> dailyStatus =new ArrayList<>();
+		
+		BingeScoreResponse bingeScoreResponse =new BingeScoreResponse();
+		
+		if(watchData==null || watchData.size()==0)
+			return null;
+		
+		Map<Date, List<WatchData>> map=watchData.stream()
+		  .collect(Collectors.groupingBy(WatchData::getDateWatch));
+		Long totalWatchDuration = 0L;
+		 Long refSum=0L;
+		  for (Map.Entry<Date, List<WatchData>> entry : map.entrySet()) {
+			  Long sum=entry.getValue().stream().mapToLong(o -> o.getDuration()).sum();
+			  refSum+=entry.getValue().stream().filter(val-> val.getRefId()!=null).mapToLong(o -> o.getDuration()).sum();
+
+			  
+			  DailyStats dailyStats =new DailyStats();
+			  dailyStats.setDate(entry.getKey().getTime());
+			  dailyStats.setDuration(sum);
+			  dailyStatus.add(dailyStats);
+			  
+			  totalWatchDuration+=sum;
+			  
+		  }
+		  
+		  bingeScoreResponse.setDailyStats(dailyStatus);
+		  bingeScoreResponse.setReedamable(true);
+		  bingeScoreResponse.setRefDuration(refSum);
+		  bingeScoreResponse.setTotalWatchDuration(totalWatchDuration);
+		
+		return bingeScoreResponse;
 	}
 }

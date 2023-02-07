@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.entity.BingeScoreResponse;
 import com.example.demo.entity.ContentReferral;
 import com.example.demo.entity.StreakTxn;
 import com.example.demo.entity.WatchData;
@@ -77,6 +78,13 @@ public class MainController {
 			List<WatchData> x = watchDataRepository.getReferralData(accountId);
 			return x;
 		}
+		
+		@GetMapping(value = "/bingscore/{accountId}")
+		public BingeScoreResponse bingScore(@PathVariable("accountId") String accountId) {
+			
+		      return serviceImpl.getDailyStats(accountId);
+		}
+
 
 	private void updateReffralBonus(String updateAccountId, int watchId) {
 		if (updateAccountId!=null) {

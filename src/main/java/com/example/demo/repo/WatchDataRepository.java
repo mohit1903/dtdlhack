@@ -15,5 +15,8 @@ public interface WatchDataRepository extends CrudRepository<WatchData, Integer> 
 	
 	@Query("FROM WatchData where accountId =:id and refId is not null")
 	List<WatchData> getReferralData(String id);
+	
+
+	List<WatchData> findAllByAccountId(String id);
 		
   }
