@@ -20,7 +20,7 @@ import jakarta.persistence.Table;
 public class WatchData {
     
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
-    Integer id;
+    Integer watchId;
     
 	String accountId;
     
@@ -30,35 +30,34 @@ public class WatchData {
 
 	Date dateWatch;
     
-    public WatchData(int id, String accountId, String contentType, long duration, Date dateWatch, String refId,
+	String refId;
+    
+    boolean isRedeemed;
+    
+    public WatchData(int watchId, String accountId, String contentType, long duration, Date dateWatch, String refId,
 			boolean isRedeemed, String coupon, String link) {
 		super();
-		this.id = id;
+		this.watchId = watchId;
 		this.accountId = accountId;
 		this.contentType = contentType;
 		this.duration = duration;
 		this.dateWatch = dateWatch;
 		this.refId = refId;
 		this.isRedeemed = isRedeemed;
-		this.coupon = coupon;
-		this.link = link;
+	}
+    
+    
+    public WatchData() {
+		super();
 	}
 
-	String refId;
-    
-    boolean isRedeemed;
-    
-    String coupon;
-    
-    String link;
-    
-    
-    public int getId() {
-		return id;
+
+	public int getId() {
+		return watchId;
 	}
 
 	public void setId(int id) {
-		this.id = id;
+		this.watchId = id;
 	}
 
 	public String getAccountId() {
@@ -108,26 +107,5 @@ public class WatchData {
 	public void setRedeemed(boolean isRedeemed) {
 		this.isRedeemed = isRedeemed;
 	}
-
-	public String getCoupon() {
-		return coupon;
-	}
-
-	public void setCoupon(String coupon) {
-		this.coupon = coupon;
-	}
-
-	public String getLink() {
-		return link;
-	}
-
-	public void setLink(String link) {
-		this.link = link;
-	}
-    
-    
-   
-    
-
 
 }
