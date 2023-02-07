@@ -34,8 +34,12 @@ public class WatchData {
     
     boolean isRedeemed;
     
-    public WatchData(int watchId, String accountId, String contentType, long duration, Date dateWatch, String refId,
-			boolean isRedeemed, String coupon, String link) {
+    long contentId;
+    
+
+
+	public WatchData(int watchId, String accountId, String contentType, long duration, Date dateWatch, String refId,
+			boolean isRedeemed, String coupon, String link,long contentId) {
 		super();
 		this.watchId = watchId;
 		this.accountId = accountId;
@@ -44,8 +48,18 @@ public class WatchData {
 		this.dateWatch = dateWatch;
 		this.refId = refId;
 		this.isRedeemed = isRedeemed;
+		this.contentId = contentId;
 	}
-    
+	
+    public long getContentId() {
+		return contentId;
+	}
+
+
+	public void setContentId(long contentId) {
+		this.contentId = contentId;
+	}
+
     
     public WatchData() {
 		super();

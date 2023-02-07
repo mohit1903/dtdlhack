@@ -1,19 +1,23 @@
 package com.example.demo.controllers;
 
 import java.util.Calendar;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.entity.ContentReferral;
 import com.example.demo.entity.StreakTxn;
 import com.example.demo.entity.WatchData;
 import com.example.demo.repo.StreakTxnDataRepository;
 import com.example.demo.repo.WatchDataRepository;
-import com.example.service.Service;
+import com.example.demo.service.ServiceImpl;
 
 @RestController
 public class MainController {
@@ -25,6 +29,9 @@ public class MainController {
 
 	@Autowired
 	StreakTxnDataRepository streakTxnDataRepository;
+	
+	@Autowired
+	ServiceImpl serviceImpl;
 
 	@GetMapping("/")
 	public String index() {
@@ -35,13 +42,18 @@ public class MainController {
 	public WatchData createUser(@RequestBody WatchData data) {
 		WatchData dataS=null;
 		if (data.getDuration() > TEN_MIN) {
-			StreakTxn oldStreak = streakTxnDataRepository.getLatestScore(data.getAccountId());
+			StreakTxn oldStreak = serviceImpl.getStreakScoreAndBreak(data.getAccountId());
 			StreakTxn newStreak = new StreakTxn();
 
 			Long prevScore = oldStreak.getNewScore();
 			long minutes = (data.getDuration() / 1000) / 60;
-			double newScore = prevScore + (minutes * 0.01);
-
+			double newScore ;
+			if (data.getContentType() != "Live") {
+				newScore = prevScore + (minutes * 0.02);
+			} else {
+				newScore = prevScore + (minutes * 0.01);
+			}
+			
 			newStreak.setLastScore(prevScore);
 			newStreak.setNewScore((long) newScore);
 			newStreak.setAccountId(oldStreak.getAccountId());
@@ -58,10 +70,17 @@ public class MainController {
 		}
 		return dataS;
 	}
+	
+		@GetMapping(value = "/getReferDetails/{accountId}")
+		public List<WatchData> referContent(@PathVariable("accountId") String accountId) {
+			
+			List<WatchData> x = watchDataRepository.getReferralData(accountId);
+			return x;
+		}
 
 	private void updateReffralBonus(String updateAccountId, int watchId) {
 		if (updateAccountId!=null) {
-			StreakTxn refOldData = streakTxnDataRepository.getLatestScore(updateAccountId);
+			StreakTxn refOldData = serviceImpl.getStreakScoreAndBreak(updateAccountId);
 			StreakTxn newStreak = new StreakTxn();
 			newStreak.setAction("Ref");
 			newStreak.setAccountId(updateAccountId);
@@ -73,5 +92,5 @@ public class MainController {
 			streakTxnDataRepository.save(newStreak);			
 		}
 	}
-
+	
 }
